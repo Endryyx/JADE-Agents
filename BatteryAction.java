@@ -1,8 +1,15 @@
-package mas_1_4;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mas_1_5;
 
-/** @author endryys*/
+/**
+ *
+ * @author endryys
+ */
 public class BatteryAction {
-    
     public float ChargingStatus(float power,float interval, float capacity,float soc_max,float soc ){
         float soc_output;
         float p_charge,e_charge,e_capacity,e_available;
@@ -26,5 +33,5 @@ public class BatteryAction {
         soc_output=(1-(e_discharge/e_available))*soc;
         
         return soc_output;
-    }
+    }    
 }

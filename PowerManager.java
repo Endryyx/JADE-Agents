@@ -1,4 +1,4 @@
-package mas_1_4;
+package mas_1_5;
 import jade.core.Agent;
 import jade.core.AID;
 import jade.core.behaviours.*;
@@ -10,10 +10,10 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.text.DecimalFormat;
 
-/** @author endryys*/
+/**@author endryys*/
+
 public class PowerManager extends Agent {
-    
-   	// The title of the book to buy
+  	// The title of the book to buy
 	private String potenciaDemanda_Str;
         private float potenciaDemanda;
 
@@ -22,6 +22,7 @@ public class PowerManager extends Agent {
         private AID[] AgentesBaterias;
         private AID[] AgentesConsumidores;
         private  int count=0;
+        private ACLMessage demand_point=new ACLMessage();
 
 	// Put agent initializations here
 	protected void setup() {
@@ -64,13 +65,15 @@ public class PowerManager extends Agent {
                 
                mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
                  //Receive demand point
-                ACLMessage demand_point = myAgent.receive(mt);
+               // ACLMessage demand_point = myAgent.receive(mt);
+               demand_point = myAgent.receive(mt);
                                 
                 if (demand_point!=null){
                     potenciaDemanda_Str = demand_point.getContent();
-                    addBehaviour(new GenerationBehaviour());
+                    myAgent.addBehaviour(new GenerationBehaviour());
+                
                 }else{
-                    System.out.println("Esperando a que haya consumidores...\n");
+                    //System.out.println("Esperando a que haya consumidores...\n");
                     block();//It's blocked until demand_point was different null
                 }                    
             }
@@ -143,7 +146,7 @@ public class PowerManager extends Agent {
                     int k=0;
                     int n=AgentesGeneradores.length;
                     AID gen;
-                    AID[] generator_id,battery_id;
+                    AID[] generator_id,battery_id,consumer_id;
                     float p_generated,price;
                     float price_=0;
                     float priceS=0;
@@ -305,7 +308,7 @@ public class PowerManager extends Agent {
 				break;
                                 
                         case 4:
-                                
+                                myAgent.doWait(3000);
                                 pcc_initial_=potenciaDemanda-this.potenciaGenerada;
                                 System.out.println("Pcc Inicial: "+pcc_initial_+"(kW)");
                                 pcc_initial=Float.toString(pcc_initial_);
@@ -354,7 +357,7 @@ public class PowerManager extends Agent {
 				cfp_batt.setContent(batt_input);
 				cfp_batt.setConversationId("PM_BATT");
 				cfp_batt.setReplyWith("cfp_batt"+System.currentTimeMillis()); // Unique value
-                                System.out.println("Power Manager envia CFP a las baterías con el mensaje: "+cfp_batt.getContent());
+                                System.out.println("\nPower Manager envia CFP a las baterías con el mensaje: "+cfp_batt.getContent());
 				myAgent.send(cfp_batt);
                                 //block();
                                 
@@ -375,7 +378,7 @@ public class PowerManager extends Agent {
                                     System.out.println("Power Manager recibe una propuesta de: "+reply_batt.getContent());
                                     // Reply received
                                     if (reply_batt.getPerformative() == ACLMessage.PROPOSE) {
-
+                                                                               
                                          //Tratamiento de la propuesta recibida
                                         batt_output = reply_batt.getContent();
                                         String[] items_batt = batt_output.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
@@ -402,12 +405,22 @@ public class PowerManager extends Agent {
                                         
                                    }
                                     step=6;
+                                    //addBehaviour(new CommitDemandPoint());
                                 
                                 }else{
                                     //System.out.println("Power Manager no ha recibido ninguna propuesta de las baterías .");
                                     step=5;
                                 }
-                           break;   
+                           break;
+                           
+                        case 6:
+                            
+                            //Se genera una confirmación al consumidor, respondiendo al mensaje demand_point
+                            //myAgent.addBehaviour(new Reply_Consumer());
+                            myAgent.addBehaviour(new CommitDemandPoint());
+                            
+                            step=7;
+                            break;
 			}             
 		}
                 
@@ -420,4 +433,94 @@ public class PowerManager extends Agent {
 		}
 	}  // End of inner class RequestPerformer
         
+        private class CommitDemandPoint extends CyclicBehaviour{
+            
+            public AID[] consumer_id;
+            private MessageTemplate mt; // The template to receive replies
+            private boolean  end=false;
+            
+            public void action(){
+                
+                   /* if(demand_point!=null){
+                        ACLMessage commit_demand=demand_point.createReply();
+                        commit_demand.setPerformative(ACLMessage.CONFIRM);
+                        commit_demand.setContent("Punto de demanda satisfecho");
+                        System.out.println(myAgent.getName()+"envia "+"Punto de demanda satisfecho"+" a agente "+commit_demand.getSender().getName());
+                        myAgent.send(commit_demand);
+                        }else{
+                           System.out.println("El punto de demanda esta vacío\n");
+                        }*/
+                    ACLMessage commit_demand=new ACLMessage(ACLMessage.CONFIRM); 
+                    
+                    //Se busca el consumidor para enviarselo
+		
+                    DFAgentDescription template = new DFAgentDescription();
+                    ServiceDescription sd = new ServiceDescription();
+                    sd.setType("confirmacion-PM");
+                    template.addServices(sd);
+                            
+                    try {
+                       DFAgentDescription[] result = DFService.search(myAgent, template); 
+                                 
+                       if(result.length>0){
+                          //System.out.println("Se encuentran los siguientes agentes consumidores:");
+                          AgentesConsumidores = new AID[result.length];
+                          for (int i = 0; i < result.length; ++i) {
+                               AgentesConsumidores[i] = result[i].getName();
+                               //System.out.println(AgentesConsumidores[i].getName());                            
+                          }
+                         }else{
+                           System.out.println("No se ha podido contactar con ningún consumidor... ");
+                           count++;
+                           if (count==8){
+                               myAgent.doDelete();        
+                           }
+                                                  
+                         }
+						
+                    }catch (FIPAException fe) {
+                       fe.printStackTrace();
+                    }
+                            
+                    // Send the cfp to all sellers
+                    for (int i = 0; i < AgentesConsumidores.length; ++i) {
+                            commit_demand.addReceiver(AgentesConsumidores[i]);
+                    }
+                    //p_generations=new int[AgentesGeneradores.length];
+                    consumer_id=new AID[AgentesConsumidores.length];
+                    commit_demand.setContent(potenciaDemanda_Str);
+                    //commit_demand.setContent("Punto de demanda satisfecho");
+                    commit_demand.setConversationId("PM_C");
+                    commit_demand.setReplyWith("commit_demand"+System.currentTimeMillis()); // Unique value
+                    myAgent.send(commit_demand);
+
+                    //System.out.println("Power Manager envia la CONFIRMACION al consumidor: "+commit_demand.getContent());
+                    //addBehaviour(new Reply_Consumer());
+                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId("PM_C"),MessageTemplate.MatchInReplyTo(commit_demand.getReplyWith()));
+                    ACLMessage reply_commit=myAgent.receive(mt);
+                    
+                    /*if(reply_commit!=null){
+                        if (reply_commit.getPerformative() == ACLMessage.AGREE) {
+                            System.out.println("Power Manager ha recibido la performativa AGREE.\n");
+
+                            addBehaviour(new ReceiveDemand());
+                            
+                        }
+                        if (reply_commit.getPerformative() == ACLMessage.CANCEL ||reply_commit.getPerformative() == ACLMessage.FAILURE ) {
+                            System.out.println("Power Manager ha recibido la performativa CANCEL ó FAILURE.\n");                           
+                            myAgent.doDelete();
+                        }
+                        
+                    }else{
+                        //System.out.println("No se ha recibido respuesta del consumidor tras satisfacer punto de demanda.\n");
+                        block();
+                    }*/
+            }
+            /*public boolean done(){
+                end=true;
+                return end;
+            }*/
+        }
+
+     
 }

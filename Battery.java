@@ -1,4 +1,5 @@
-package mas_1_4;
+
+package mas_1_5;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -8,10 +9,11 @@ import java.text.DecimalFormat;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-
-/**@author endryys*/
-
-public class Battery extends Agent{
+/**
+ *
+ * @author endryys
+ */
+public class Battery extends Agent {
     private String p_nominal;
     private String capacity;
     private String soc;
@@ -240,5 +242,5 @@ public class Battery extends Agent{
                      System.out.println("\nBatería envía la propuesta : "+propuesta+"\n");
                 }
             }
-    }
+    }    
 }

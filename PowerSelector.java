@@ -1,11 +1,16 @@
-package mas_1_4;
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mas_1_5;
 import jade.core.AID;
-
-/**@author endryys*/
-
+/**
+ *
+ * @author endryys
+ */
 public class PowerSelector {
-   int j, k,n;
+  int j, k,n;
     private float lastPrice;
     private AID lastGen;
     private float lastPower;
@@ -304,5 +309,5 @@ public class PowerSelector {
     
      return agentsG2;
         
-    }    
+    }      
 }

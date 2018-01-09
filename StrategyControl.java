@@ -1,9 +1,16 @@
-package mas_1_4;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mas_1_5;
 
-/**@author endryys*/
-
+/**
+ *
+ * @author endryys
+ */
 public class StrategyControl {
- //Class method to control Peak Shaving
+//Class method to control Peak Shaving
     public float[] PeakShaving(float pcc_initial){
         
         float pcc_upper;
@@ -25,7 +32,7 @@ public class StrategyControl {
             //Batteries must provide energy
             status=1;
             p_diff=pcc_initial-pcc_upper;
-            System.out.println("p_diff = "+p_diff);
+            System.out.println("\np_diff = "+p_diff);
         }
         
         //If power is below lower threshold means that generation overcome demand
@@ -50,7 +57,7 @@ public class StrategyControl {
             }           
         }
         float controlP[]={p_diff,status};
-        System.out.println("controlP[] = "+controlP[0] +" , "+ controlP[1]);
+        System.out.println("controlP[] = "+controlP[0] +" , "+ controlP[1]+"\n");
         return controlP;    
 
     }
@@ -64,5 +71,5 @@ public class StrategyControl {
     public void Smoothing(){
         
     }        
-    
+     
 }

@@ -1,8 +1,15 @@
-package mas_1_4;
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mas_1_5;
 import jade.core.AID;
 
-/**@author endryys*/
+/**
+ *
+ * @author endryys
+ */
 /*This class is a special kind of array, this array serves to storage differents
 types of data from an agent. Mainly:
 Agent's name (AID)
@@ -11,8 +18,6 @@ Agent's reactive power (float)
 Agent's apparent power (float)
 Active Power's price(float)
 Reactive Power's price(float)*/
-
-
 public class AgentFeatures {
   //Attributes
     public AID agentAID;
@@ -70,5 +75,5 @@ public class AgentFeatures {
     public void SetArrayAgent_s(float s){
         this.s=s;
         
-    }    
+    }        
 }
