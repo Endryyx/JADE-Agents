@@ -1,8 +1,15 @@
-package mas_1_4;
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mas_1_10;
 import jade.core.AID;
 
-/**@author endryys*/
+/**
+ *
+ * @author endryys
+ */
 /*This class is a special kind of array, this array serves to storage differents
 types of data from an agent. Mainly:
 Agent's name (AID)
@@ -11,16 +18,13 @@ Agent's reactive power (float)
 Agent's apparent power (float)
 Active Power's price(float)
 Reactive Power's price(float)*/
-
-
 public class AgentFeatures {
   //Attributes
     public AID agentAID;
     public float p;
-    public float q;
     public float p_price;
-    public float q_price;
-    public float s;
+    public float soc;
+    public int aCD;
     //public int i; 
 
     public AID GetArrayAgent_AID(){
@@ -39,12 +43,12 @@ public class AgentFeatures {
         this.p=p;
         
     }
-    public float GetArrayAgent_q(){
+    public float GetArrayAgent_soc(){
     
-       return q;
+       return soc;
     }
-    public void SetArrayAgent_q(float q){
-        this.q=q;
+    public void SetArrayAgent_soc(float soc){
+        this.soc=soc;
         
     }
     public float GetArrayAgent_p_price(){
@@ -55,20 +59,13 @@ public class AgentFeatures {
         this.p_price=p_price;
         
     }
-    public float GetArrayAgent_q_price(){
+    public int GetArrayAgent_aCD(){
         
-        return q_price;
+        return aCD;
     }
-    public void SetArrayAgent_q_price(float q_price){
-        this.q_price=q_price;
+    public void SetArrayAgent_aCD(int aCD){
+        this.aCD=aCD;
         
-    }  
-    public float GetArrayAgent_s(){
-        
-        return s;
-    }
-    public void SetArrayAgent_s(float s){
-        this.s=s;
-        
-    }    
+    }        
 }
+

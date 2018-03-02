@@ -1,20 +1,20 @@
-package mas_1_4;
-
+package mas_1_10;
 import jade.core.AID;
 
 /**@author endryys*/
 
 public class PowerSelector {
-   int j, k,n;
+    public int j, k,n;
     private float lastPrice;
     private AID lastGen;
     private float lastPower;
    
     //Inside this array it will be saved all the elements
-    public AgentFeatures[] agentsG=new AgentFeatures[30];
     public int i;
+    public AgentFeatures[] agentsG=new AgentFeatures[30];
     public AgentFeatures[]agentsG2=new AgentFeatures[30];
-
+    public AgentFeatures[] agentsB1=new AgentFeatures[30];
+    public AgentFeatures[] agentsB2=new AgentFeatures[30];
  
     public AgentFeatures[] DataStorage(int numAgents,AID generator_id, float p_generated, float price){
         
@@ -22,20 +22,21 @@ public class PowerSelector {
     ag.SetArrayAgent_AID(generator_id);
     ag.SetArrayAgent_p(p_generated);
     ag.SetArrayAgent_p_price(price);
-    
     agentsG[i]=ag;      
-     i++;
-
-     //if (i>1){
-        //System.out.println("matrix1"+"["+0+"]"+"["+1+"]"+":"+matrixAgentFeatures[0][1].GetArrayAgent_AID());
-        /*System.out.println("agentsG: "+agentsG[1].GetArrayAgent_AID());
-        System.out.println("agentsG: "+agentsG[1].GetArrayAgent_p());
-        System.out.println("agentsG: "+agentsG[1].GetArrayAgent_p_price());
-        System.out.println("agentsG: "+agentsG[0].GetArrayAgent_AID());
-        System.out.println("agentsG: "+agentsG[0].GetArrayAgent_p());
-        System.out.println("agentsG: "+agentsG[0].GetArrayAgent_p_price());*/
-     //}
-     return  agentsG; 
+    i++;
+    return  agentsG; 
+    }
+    
+    public AgentFeatures[] DataStorage_batt(int numBatts,AID batt_id, float p_batt, float soc, int aCD){
+        
+    AgentFeatures ab=new AgentFeatures();
+    ab.SetArrayAgent_AID(batt_id);
+    ab.SetArrayAgent_p(p_batt);
+    ab.SetArrayAgent_soc(soc);
+    ab.SetArrayAgent_aCD(aCD);
+    agentsB1[k]=ab;
+    k++;
+    return agentsB1; 
     }
     
     public AgentFeatures[]DataOrganizer(int numAgents,AgentFeatures[] arrAgentFeatures,float price_mean){
@@ -55,10 +56,10 @@ public class PowerSelector {
      float[] price=new float[numAgents];
      
      //Auxiliar variables to arranging and classifying the values of prices and power mainly
-     AID[] aid_d=new AID[numAgents];
-     AID[] aid_a=new AID[numAgents];
-     float[] p_d=new float[numAgents];
-     float[] p_a=new float[numAgents];
+     AID[] aid_d=new AID[numAgents];//aid_discard
+     AID[] aid_a=new AID[numAgents];//aid_arrange
+     float[] p_d=new float[numAgents];//power_discard
+     float[] p_a=new float[numAgents];//power_arrange
      float[] price_d=new float[numAgents];
      float[] price_a=new float[numAgents];
      
@@ -88,12 +89,6 @@ public class PowerSelector {
              aid_d[e0]=aid[l];             
              price_d[e0]=price[l];
              p_d[e0]=p[l];
-             /*System.out.println("aid["+l+"] :"+aid[l]);
-             System.out.println("price["+l+"] :"+price[l]);
-             System.out.println("p["+l+"] :"+p_d[l]);*/
-             /*System.out.println("aid_d["+e0+"] :"+aid_d[e0]);
-             System.out.println("price_d["+e0+"] :"+price_d[e0]);
-             System.out.println("p_d["+e0+"] :"+p_d[e0]);*/
              e0++;
              
              //It's classified by price from cheaper to expensive by bubble method
@@ -123,36 +118,6 @@ public class PowerSelector {
                  }
                  
              }             
-               /*if(price[l]>lastPrice){
-                 lastPrice=price[l];
-                 lastGen=aid[l];
-                 lastPower=p[l];
-                 h=l+1;
-                 for(k=h;k<numAgents;++k){
-                    price[k-1]=price[k];
-                    aid[k-1]=aid[k];
-                    p[k-1]=p[k];
-                 }
-                 price[numAgents-1]=lastPrice;
-                 aid[numAgents-1]=lastGen;
-                 p[numAgents-1]=lastPower;
-                 
-             }else{
-                 System.out.println("El precio price["+l+"]="+price[l]+"no es el precio más alto.");
-                 for(k=1;k<numAgents;++k){
-                     if(price[l]>price[numAgents-k]){
-                         h=l+1;
-                         for(k=h; k<numAgents-1;++k){
-                             price[k-1]=price[k];
-                             aid[k-1]=aid[k];
-                             p[k-1]=p[k];
-                         }
-                         price[numAgents-k]=price[l];
-                         aid[numAgents-k]=aid[l];
-                         p[numAgents-k]=p[l];
-                     }
-                 }
-             }*/
              
          }else{
              arrange++;
@@ -162,9 +127,6 @@ public class PowerSelector {
              aid_a[e]=aid[l];             
              p_a[e]=p[l];
              price_a[e]=price[l];
-            /* System.out.println("aid_a["+e+"]: "+aid_a[e]);
-             System.out.println("p_a["+e+"]: "+p_a[e]);
-             System.out.println("price_a["+e+"]: "+price_a[e]);*/
               e++;
              //It's classified by price from cheaper to expensive by bubble method
              for(h=0; h<arrange-1; ++h){
@@ -193,66 +155,9 @@ public class PowerSelector {
                  }
                  
              }             
-             
-             
-             /*//It's used the bubble algorithm for arraging the info from arrays
-             //The arrange of prices are commented, and it's arrange the power
-             for(h=0; h<numAgents-1-discard;++h){
-                 for(j=0;j<numAgents-1-discard-h;++j){
-                     //System.out.println("price[j+1] :"+price[j+1]);
-                     //System.out.println("price[j] :"+price[j]);
-                     System.out.println("p[j+1] :"+p[j+1]);
-                     System.out.println("p[j] :"+p[j]);
-                     //if(price[j+1]>price[j]){
-                     if(p[j+1]>p[j]){
-                         
-                         //Order price
-                         aux2=price[j+1];
-                         price[j+1]=price[j];
-                         price[j]=aux2;
-                         
-                         //Order power
-                         
-                         aux1=p[j+1];
-                         p[j+1]=p[j];
-                         p[j]=aux1;
-                         
-                         //Order aid
-                         aux0=aid[j+1];
-                         aid[j+1]=aid[j];
-                         aid[j]=aux0;
-                     }
-                     
-                 }
-                 
-             }*/
          }
-         //It's perform the inverse transform from arrays to matrix2
-         /*System.out.println("aid["+l+"]: "+aid[l]);
-         System.out.println("p["+l+"]: "+p[l]);
-         System.out.println("price["+l+"]: "+price[l]);*/
-         
-       /*¡¡IT'S VERY IMPORTANT THAT THE INIZIALITATION OF OBJECT BE PLACED 
-         HERE, JUST BEFORE TO STORAGE NEW VALUES BECAUSE, IT MUST BE A NEW 
-         OBJECT FOR EACH VALUE OF ARRAY, NOT THE SAME OBJECT!!*/
-        /*AgentFeatures ag2=new AgentFeatures();
-        ag2.SetArrayAgent_AID(aid[l]);
-        ag2.SetArrayAgent_p(p[l]);
-        ag2.SetArrayAgent_p_price(price[l]);
-        agentsG2[l]=ag2;*/
-
      }
      if(l==numAgents){
-         /*for(h=0;h<discard;h++){
-             System.out.println("aid_d["+h+"] :"+aid_d[h]);
-             System.out.println("p_d["+h+"] :"+p_d[h]);
-             System.out.println("price_d["+h+"] :"+price_d[h]);             
-         }
-         for(h=0;h<arrange;h++){
-             System.out.println("aid_a["+h+"] :"+aid_a[h]);
-             System.out.println("p_a["+h+"] :"+p_a[h]);
-             System.out.println("price_a["+h+"] :"+price_a[h]);             
-         }*/
          //It's componed the array general by arrange's and discard's values 
          e=0;
          for(h=0;h<numAgents;h++){
@@ -304,5 +209,267 @@ public class PowerSelector {
     
      return agentsG2;
         
-    }    
+    }
+    
+    public AgentFeatures[]DataOrganizer_batt_Ascending(int numBatts,AgentFeatures[] arrAgentFeatures){
+        
+     int arrange=0;
+     int h=0;
+     int l=0;
+     int e=0;
+     int e0=0;
+     float aux1,aux2;
+     int aux3;
+     AID aux0;
+     
+     AID[] aid=new AID[numBatts];
+     float[] p=new float[numBatts];
+     float[] soc=new float[numBatts];
+     int[] aCD=new int[numBatts];
+     
+     //Auxiliar variables to arranging and classifying the values of soc and power mainly
+
+     AID[] aid_a=new AID[numBatts];//aid_arrange
+     float[] p_a=new float[numBatts];//power_arrange
+     float[] soc_a=new float[numBatts];
+     int[] aCD_a=new int[numBatts];
+     
+     
+     /**It's saved the values of matrix in arrays in order to be more 
+      * comfortable to manage the information*/
+     
+     for(i=0;i<numBatts;++i){
+         soc[i]=arrAgentFeatures[i].GetArrayAgent_soc();
+         p[i]=arrAgentFeatures[i].GetArrayAgent_p();
+         aCD[i]=arrAgentFeatures[i].GetArrayAgent_aCD();
+         aid[i]=arrAgentFeatures[i].GetArrayAgent_AID();
+     }
+     for(i=0;i<numBatts;i++){
+        /* System.out.println("price["+i+"]: "+price[i]);
+         System.out.println("p["+i+"]: "+p[i]);
+         System.out.println("aid["+i+"]: "+aid[i]);*/
+     }
+
+     for(l=0;l<numBatts;++l){
+         
+         System.out.println("Se analiza el SOC de la batería "+aid[l]+":  soc["+l+"] ="+soc[l]+"\n");
+         arrange++;
+         //It's saved in arranger's array
+         aid_a[e]=aid[l];             
+         p_a[e]=p[l];
+         soc_a[e]=soc[l];
+         aCD_a[e]=aCD[l];
+         e++;
+         //It's classified by price from cheaper to expensive by bubble method
+         for(h=0; h<arrange-1; ++h){
+                for(j=0;j<arrange-1-h; ++j){
+                /*System.out.println("p[j+1] :"+p_a[j+1]);
+                System.out.println("p[j] :"+p_a[j]);*/
+                
+                   if(soc_a[j+1]>soc_a[j]){
+               
+                        //Order SOC
+                        aux2=soc_a[j+1];
+                        soc_a[j+1]=soc_a[j];
+                        soc_a[j]=aux2;
+                         
+                        //Order power
+                        aux1=p_a[j+1];
+                        p_a[j+1]=p_a[j];
+                        p_a[j]=aux1;
+                        
+                        //Order aCD automatic Charge/Discharge
+                        aux3=aCD_a[j+1];
+                        aCD_a[j+1]=aCD_a[j];
+                        aCD_a[j]=aux3;
+                         
+                        //Order aid
+                        aux0=aid_a[j+1];
+                        aid_a[j+1]=aid_a[j];
+                        aid_a[j]=aux0;
+                    }
+                     
+                }
+                 
+            }             
+        }
+     
+     if(l==numBatts){
+         //It's componed the array general by arrange's and discard's values 
+         e=0;
+         for(h=0;h<numBatts;h++){
+             
+                aid[h]=aid_a[h]; 
+                p[h]=p_a[h];
+                soc[h]=soc_a[h];
+                aCD[h]=aCD_a[h];
+                /*¡¡IT'S VERY IMPORTANT THAT THE INIZIALITATION OF OBJECT BE PLACED 
+                  HERE, JUST BEFORE TO STORAGE NEW VALUES BECAUSE, IT MUST BE A NEW 
+                  OBJECT FOR EACH VALUE OF ARRAY, NOT THE SAME OBJECT!!*/
+                AgentFeatures ab2=new AgentFeatures();
+                ab2.SetArrayAgent_AID(aid[h]);
+                ab2.SetArrayAgent_p(p[h]);
+                ab2.SetArrayAgent_soc(soc[h]);
+                ab2.SetArrayAgent_aCD(aCD[h]);
+                agentsB2[h]=ab2;                      
+         }    
+     }
+     System.out.println("Se ordena el SOC de MAYOR a menor estado de carga\n");
+     //Show the results
+     for(h=0;h<numBatts;h++){
+         
+         System.out.println("agentsB2["+h+"]"+"AID :"+agentsB2[h].GetArrayAgent_AID());
+         System.out.println("agentsB2["+h+"]"+"Potencia :"+agentsB2[h].GetArrayAgent_p()+"W");
+         System.out.println("agentsB2["+h+"]"+"SOC :"+agentsB2[h].GetArrayAgent_soc()+"%");
+         System.out.println("agentsB2["+h+"]"+"aCD :"+agentsB2[h].GetArrayAgent_aCD()+".\n");
+     }
+     return agentsB2;   
+    }
+    
+    
+    public AgentFeatures[]DataOrganizer_batt_Descending(int numBatts,AgentFeatures[] arrAgentFeatures){
+        
+     int arrange=0;
+     int h=0;
+     int l=0;
+     int e=0;
+     int e0=0;
+     float aux1,aux2;
+     int aux3;
+     AID aux0;
+     
+     AID[] aid=new AID[numBatts];
+     float[] p=new float[numBatts];
+     float[] soc=new float[numBatts];
+     int[] aCD=new int[numBatts];
+     
+     //Auxiliar variables to arranging and classifying the values of soc and power mainly
+
+     AID[] aid_a=new AID[numBatts];//aid_arrange
+     float[] p_a=new float[numBatts];//power_arrange
+     float[] soc_a=new float[numBatts];
+     int[] aCD_a=new int[numBatts];
+     
+     
+     /**It's saved the values of matrix in arrays in order to be more 
+      * comfortable to manage the information*/
+     
+     for(i=0;i<numBatts;++i){
+         soc[i]=arrAgentFeatures[i].GetArrayAgent_soc();
+         p[i]=arrAgentFeatures[i].GetArrayAgent_p();
+         aCD[i]=arrAgentFeatures[i].GetArrayAgent_aCD();
+         aid[i]=arrAgentFeatures[i].GetArrayAgent_AID();
+     }
+     for(i=0;i<numBatts;i++){
+        /* System.out.println("price["+i+"]: "+price[i]);
+         System.out.println("p["+i+"]: "+p[i]);
+         System.out.println("aid["+i+"]: "+aid[i]);*/
+     }
+
+     for(l=0;l<numBatts;++l){
+         
+         System.out.println("Se analiza el SOC de la batería "+aid[l]+":  soc["+l+"] ="+soc[l]+"\n");
+         arrange++;
+         //It's saved in arranger's array
+         aid_a[e]=aid[l];             
+         p_a[e]=p[l];
+         soc_a[e]=soc[l];
+         aCD_a[e]=aCD[l];
+         e++;
+         //It's classified by price from cheaper to expensive by bubble method
+         for(h=0; h<arrange-1; ++h){
+                for(j=0;j<arrange-1-h; ++j){
+                /*System.out.println("p[j+1] :"+p_a[j+1]);
+                System.out.println("p[j] :"+p_a[j]);*/
+
+                   if(soc_a[j+1]<soc_a[j]){
+               
+                        //Order SOC
+                        aux2=soc_a[j+1];
+                        soc_a[j+1]=soc_a[j];
+                        soc_a[j]=aux2;
+                         
+                        //Order power
+                        aux1=p_a[j+1];
+                        p_a[j+1]=p_a[j];
+                        p_a[j]=aux1;
+                        
+                        //Order aCD automatic Charge/Discharge
+                        aux3=aCD_a[j+1];
+                        aCD_a[j+1]=aCD_a[j];
+                        aCD_a[j]=aux3;
+                         
+                        //Order aid
+                        aux0=aid_a[j+1];
+                        aid_a[j+1]=aid_a[j];
+                        aid_a[j]=aux0;
+                    }
+                     
+                }
+                 
+            }             
+        }
+     
+     if(l==numBatts){
+         //It's componed the array general by arrange's and discard's values 
+         e=0;
+         for(h=0;h<numBatts;h++){
+             
+                aid[h]=aid_a[h]; 
+                p[h]=p_a[h];
+                soc[h]=soc_a[h];
+                aCD[h]=aCD_a[h];
+                /*¡¡IT'S VERY IMPORTANT THAT THE INIZIALITATION OF OBJECT BE PLACED 
+                  HERE, JUST BEFORE TO STORAGE NEW VALUES BECAUSE, IT MUST BE A NEW 
+                  OBJECT FOR EACH VALUE OF ARRAY, NOT THE SAME OBJECT!!*/
+                AgentFeatures ab2=new AgentFeatures();
+                ab2.SetArrayAgent_AID(aid[h]);
+                ab2.SetArrayAgent_p(p[h]);
+                ab2.SetArrayAgent_soc(soc[h]);
+                ab2.SetArrayAgent_aCD(aCD[h]);
+                agentsB2[h]=ab2;                      
+         }    
+     }
+     System.out.println("Se ordena el SOC de MENOR a mayor estado de carga\n");
+     //Show the results
+     for(h=0;h<numBatts;h++){
+         
+         System.out.println("agentsB2["+h+"]"+"AID :"+agentsB2[h].GetArrayAgent_AID());
+         System.out.println("agentsB2["+h+"]"+"Potencia :"+agentsB2[h].GetArrayAgent_p()+"W");
+         System.out.println("agentsB2["+h+"]"+"SOC :"+agentsB2[h].GetArrayAgent_soc()+"%");
+         System.out.println("agentsB2["+h+"]"+"aCD :"+agentsB2[h].GetArrayAgent_aCD()+".\n");
+     }
+     return agentsB2;   
+    }
+    
+        public float BatteryDecision(float aCD_,String name_batt,float p_batt,float soc_batt,float potenciaBaterias){
+        
+        float potenciaBaterias_=0;
+        
+        if(aCD_==1){
+            System.out.println(p_batt+"(kW) "+"consume "+name_batt+" mediante fase de carga automática.\n");
+            System.out.println(soc_batt+"(%) "+"queda "+name_batt+".\n");
+            //potenciaBaterias=potenciaBaterias+p_batt;
+            potenciaBaterias_=potenciaBaterias;
+        }
+        if(aCD_==-1){
+            System.out.println(p_batt+"(kW) "+"aporta "+name_batt+" mediante fase de descarga automática.\n");
+            System.out.println(soc_batt+"(%) "+"queda "+name_batt+".\n");
+            //potenciaBaterias=potenciaBaterias-p_batt;
+            potenciaBaterias_=potenciaBaterias;
+        }
+        if(aCD_==0){ 
+            //System.out.println(p_batt+"(kW) "+"consume "+name_batt);
+            //System.out.println(soc_batt+"(%) "+"queda "+name_batt+".\n");
+                                                    
+            if(p_batt==0){
+                //potenciaBaterias=potenciaBaterias+p_batt; 
+                potenciaBaterias_=potenciaBaterias;
+            }else{
+                //potenciaBaterias=potenciaBaterias+p_batt; 
+                potenciaBaterias_=potenciaBaterias;
+            }
+        }
+       return potenciaBaterias_;
+    }
 }

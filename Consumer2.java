@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**@author endryys*/
-public class Consumer extends Agent{
+public class Consumer2 extends Agent{
 
 //public Consumer consumer=this;
 
@@ -30,12 +30,12 @@ public float ti=1800;
 
     protected void setup(){
         
-        System.out.println("Bienvenido consumidor "+this.getName()+".\n");
+        System.out.println("Bienvenido consumidor "+this.getName()+".");
         
         demandValue=new float[47];
         demandValue_Str=new String[47];
         String path=new String();
-        path="/home/endryys/Datos_REE1.csv";
+        path="/home/endryys/Datos_REE2.csv";
         
         ImportCSV import_csv=new ImportCSV();
        
@@ -210,7 +210,7 @@ public float ti=1800;
                request.setContent(demandValue_Str[j]);
                request.setConversationId("D_PM");
                request.setReplyWith("request"+System.currentTimeMillis()); // Unique value
-               System.out.println("\nEl consumidor "+myAgent.getName()+" envia Demanda: "+request.getContent()+"\n");
+               System.out.println("El consumidor "+myAgent.getName()+" envia Demanda: "+request.getContent());
                myAgent.send(request);
                j++;
             

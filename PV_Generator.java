@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
  *
  * @author endryys
  */
-public class Generator extends Agent{
+public class PV_Generator extends Agent{
  	// The catalogue of books for sale (maps the title of a book to its price)
 	//private Hashtable catalogo;
 	// The GUI by means of which the user can add books in the catalogue
@@ -37,7 +37,7 @@ public class Generator extends Agent{
                 System.out.println("Bienvenido! Agente-Generador "+getAID().getName()+" es Leido.");
                 //It's generated a random number of power with an upper threshold of 900(kW)
                 //p1_generada_=(float) (Math.random() * 900) + 1;
-                p1_generada_=1430;
+                p1_generada_=900;
                 DecimalFormat p1_generada_df = new DecimalFormat("0.00"); 
                 p1_generada_Str=p1_generada_df.format(p1_generada_);  
                 p1_generada=p1_generada_Str.replaceAll(",", ".");
